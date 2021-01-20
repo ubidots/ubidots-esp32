@@ -248,11 +248,11 @@ bool UbiHTTP::reconnect(const char *host, const int port) {
   }
   if (connected) {
     if (_debug) {
-      Serial.println("Connected");
+      Serial.println(F("Connected"));
     }
   } else {
     if (_debug) {
-      Serial.println("Could not connect to the server, please check your network and your firewall rules");
+      Serial.println(F("Could not connect to the server, please check your network and your firewall rules"));
     }
   }
 
@@ -355,7 +355,7 @@ bool UbiHTTP::_syncronizeTime() {
   if (_debug) {
     Serial.print(F("Setting time using SNTP"));
   }
-  configTime(8 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+  configTime(8 * 3600, 0, NTP_SERVER, NIST_SERVER);
   time_t now = time(nullptr);
   uint8_t attempts = 0;
   while (now < 8 * 3600 * 2 && attempts <= 5) {

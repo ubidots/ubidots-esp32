@@ -55,7 +55,7 @@ bool UbiUDP::sendData(const char *device_label, const char *device_name, char *p
   while (payload[i] != 0) {
     if (i > MAX_BUFFER_SIZE) {
       if (_debug) {
-        Serial.print("Datagram max length exceed, please split your data");
+        Serial.print(F("Datagram max length exceed, please split your data"));
       }
       break;
     }
@@ -81,6 +81,6 @@ void UbiUDP::setDebug(bool debug) { _debug = debug; }
  */
 
 bool UbiUDP::serverConnected() {
-  Serial.println("This method is not supported using UDP");
+  Serial.println(F("This method is not supported using UDP"));
   return false;
 }

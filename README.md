@@ -35,12 +35,12 @@ The ESP32 is a microcontroller developed by [Espressif Systems](http://espressif
 
 Creates an Ubidots instance.
 
-**NOTE:** If you use HTTP or TCP to send data, the client will implement TLS 2.0 using the [native ESP8266 secure client](https://github.com/esp8266/Arduino/blob/master/doc/esp8266wifi/client-secure-examples.rst) to secure your data. Keep in mind that due to the security checks needed, the packet may take a little more time to be sent than without TLS. If you wish to send data insecurely, use UDP or any of the available examples at our [docs](https://ubidots.com/docs/hw/).
+**NOTE:** If you use HTTP or TCP to send data, the client will implement TLS 2.0 based on the [example for ESP32 secure client](https://github.com/espressif/arduino-esp32/blob/master/libraries/HTTPClient/examples/BasicHttpsClient/BasicHttpsClient.ino) by Espressif, to secure your data. Keep in mind that due to the security checks needed, the packet may take a little more time to be sent than without TLS. If you wish to send data insecurely, use UDP or any of the available examples at our [docs](https://ubidots.com/docs/hw/).
 
 As Ubidots makes its best to secure your data, we do not guarantee any issue, data miss or external sniff coming from the native secure client or bugs in the library.
 
 - @token, [Required]. Your Ubidots unique account [TOKEN](http://help.ubidots.com/user-guides/find-your-token-from-your-ubidots-account).
-- @server, [Optional], [Options] = [`UBI_INDUSTRIAL`, `UBI_EDUCATIONAL`], [Default] = `UBI_INDUSTRIAL`. The server to send data, set `UBI_EDUCATIONAL` if your account is educational type.
+- @server, [Optional], [Options] = [`UBI_INDUSTRIAL`, `<custom_server>`], [Default] = `UBI_INDUSTRIAL`. The server to send data, set `<custom_server>` if you wish to point to another private server given by Ubidots.
 - @iot_protocol, [Optional], [Options] = [`UBI_HTTP`, `UBI_TCP`, `UBI_UDP`], [Default] = `UBI_TCP`. The IoT protocol that you will use to send or retrieve data.
 
 ## Methods

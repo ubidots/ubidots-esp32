@@ -72,7 +72,9 @@ bool UbiHTTP::sendData(const char *device_label, const char *device_name, char *
     Serial.print(_host);
     Serial.print(F("\r\n"));
     Serial.print(F("User-Agent: {USER_AGENT}\r\n"));
-    Serial.print(F("X-Auth-Token: BBFF-PddZ3rN6XW3si0udL5JOzkWTMoisin\r\n"));
+    Serial.print(F("X-Auth-Token: "));
+    Serial.print(_token);
+    Serial.print("\r\n");
     Serial.print(F("Content-Type: application/json\r\n"));
     Serial.print(F("Content-Length: "));
     Serial.print(content_length);
@@ -90,7 +92,9 @@ bool UbiHTTP::sendData(const char *device_label, const char *device_name, char *
   _client_https_ubi.print(_host);
   _client_https_ubi.print(F("\r\n"));
   _client_https_ubi.print(F("User-Agent: {USER_AGENT}\r\n"));
-  _client_https_ubi.print(F("X-Auth-Token: BBFF-PddZ3rN6XW3si0udL5JOzkWTMoisin\r\n"));
+  _client_https_ubi.print(F("X-Auth-Token: "));
+  _client_https_ubi.print(_token);
+  _client_https_ubi.print("\r\n");
   _client_https_ubi.print(F("Content-Type: application/json\r\n"));
   _client_https_ubi.print(F("Content-Length: "));
   _client_https_ubi.print(content_length);
@@ -248,11 +252,11 @@ bool UbiHTTP::reconnect(const char *host, const int port) {
   }
   if (connected) {
     if (_debug) {
-      Serial.println("Connected");
+      Serial.println(F("Connected"));
     }
   } else {
     if (_debug) {
-      Serial.println("Could not connect to the server, please check your network and your firewall rules");
+      Serial.println(F("Could not connect to the server, please check your network and your firewall rules"));
     }
   }
 
@@ -355,7 +359,7 @@ bool UbiHTTP::_syncronizeTime() {
   if (_debug) {
     Serial.print(F("Setting time using SNTP"));
   }
-  configTime(8 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+  configTime(8 * 3600, 0, NTP_SERVER, NIST_SERVER);
   time_t now = time(nullptr);
   uint8_t attempts = 0;
   while (now < 8 * 3600 * 2 && attempts <= 5) {

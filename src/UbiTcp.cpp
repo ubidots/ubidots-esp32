@@ -73,7 +73,7 @@ bool UbiTCP::sendData(const char *device_label, const char *device_name, char *p
     _client_tcps_ubi.print(payload);
   } else {
     if (_debug) {
-      Serial.println("[ERROR] Could not connect to the host");
+      Serial.println(F("[ERROR] Could not connect to the host"));
     }
     _client_tcps_ubi.stop();
     return false;
@@ -82,7 +82,7 @@ bool UbiTCP::sendData(const char *device_label, const char *device_name, char *p
   /* Waits for the host's answer */
   if (!waitServerAnswer()) {
     if (_debug) {
-      Serial.println("[ERROR] Could not read server's response");
+      Serial.println(F("[ERROR] Could not read server's response"));
     }
     _client_tcps_ubi.stop();
     return false;
@@ -112,16 +112,6 @@ double UbiTCP::get(const char *device_label, const char *variable_label) {
   _client_tcps_ubi.connect(_host, UBIDOTS_TCPS_PORT);
   reconnect(_host, UBIDOTS_TCPS_PORT);
 
-  // if (!_client_tcps_ubi.verifyCertChain(_host)) {
-  //   if (_debug) {
-  //     Serial.println(
-  //         "[ERROR] Could not verify the remote secure server certificate, "
-  //         "please make sure that you are using a secure "
-  //         "network");
-  //   }
-  //   return ERROR_VALUE;
-  // }
-
   if (_client_tcps_ubi.connected()) {
     /* Builds the request POST - Please reference this link to know all the
      * request's structures https://ubidots.com/docs/api/ */
@@ -135,17 +125,17 @@ double UbiTCP::get(const char *device_label, const char *variable_label) {
     _client_tcps_ubi.print("|end");
 
     if (_debug) {
-      Serial.println("----");
-      Serial.println("Payload for request:");
+      Serial.println(F("----"));
+      Serial.println(F("Payload for request:"));
       Serial.print(_user_agent);
-      Serial.print("|LV|");
+      Serial.print(F("|LV|"));
       Serial.print(_token);
-      Serial.print("|");
+      Serial.print(F("|"));
       Serial.print(device_label);
-      Serial.print(":");
+      Serial.print(F(":"));
       Serial.print(variable_label);
-      Serial.print("|end");
-      Serial.println("\n----");
+      Serial.print(F("|end"));
+      Serial.println(F("\n----"));
     }
 
     /* Waits for the host's answer */
@@ -184,9 +174,9 @@ void UbiTCP::reconnect(const char *host, const int port) {
   uint8_t attempts = 0;
   while (!_client_tcps_ubi.connected() && attempts < 5) {
     if (_debug) {
-      Serial.print("Trying to connect to ");
+      Serial.print(F("Trying to connect to "));
       Serial.print(host);
-      Serial.print(" , attempt number: ");
+      Serial.print(F(" , attempt number: "));
       Serial.println(attempts);
     }
     _client_tcps_ubi.stop();
@@ -209,7 +199,7 @@ bool UbiTCP::waitServerAnswer() {
     delay(1);
     if (timeout > _timeout - 1) {
       if (_debug) {
-        Serial.println("timeout, could not read any response from the host");
+        Serial.println(F("timeout, could not read any response from the host"));
       }
       return false;
     }
@@ -227,8 +217,8 @@ float UbiTCP::parseTCPAnswer(const char *request_type, char *response) {
   int j = 0;
 
   if (_debug) {
-    Serial.println("----------");
-    Serial.println("Server's response:");
+    Serial.println(F("----------"));
+    Serial.println(F("Server's response:"));
   }
 
   while (_client_tcps_ubi.available()) {
@@ -244,7 +234,7 @@ float UbiTCP::parseTCPAnswer(const char *request_type, char *response) {
   }
 
   if (_debug) {
-    Serial.println("\n----------");
+    Serial.println(F("\n----------"));
   }
 
   response[j] = '\0';
@@ -288,9 +278,9 @@ bool UbiTCP::_syncronizeTime() {
   // Synchronizes time using SNTP. This is necessary to verify that
   // the TLS certificates offered by the server are currently valid.
   if (_debug) {
-    Serial.print("Setting time using SNTP");
+    Serial.print(F("Setting time using SNTP"));
   }
-  configTime(8 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+  configTime(8 * 3600, 0, NTP_SERVER, NIST_SERVER);
   time_t now = time(nullptr);
   uint8_t attempts = 0;
   while (now < 8 * 3600 * 2 && attempts <= 5) {
@@ -304,7 +294,7 @@ bool UbiTCP::_syncronizeTime() {
 
   if (attempts > 5) {
     if (_debug) {
-      Serial.println("[ERROR] Could not set time using remote SNTP to verify Cert");
+      Serial.println(F("[ERROR] Could not set time using remote SNTP to verify Cert"));
     }
     return false;
   }
@@ -312,7 +302,7 @@ bool UbiTCP::_syncronizeTime() {
   struct tm timeinfo;
   gmtime_r(&now, &timeinfo);
   if (_debug) {
-    Serial.print("Current time: ");
+    Serial.print(F("Current time: "));
     Serial.print(asctime(&timeinfo));
   }
   return true;

@@ -59,14 +59,6 @@ bool UbiTCP::sendData(const char *device_label, const char *device_name, char *p
   /* Connecting the client */
   _client_tcps_ubi.connect(_host, UBIDOTS_TCPS_PORT);
   reconnect(_host, UBIDOTS_TCPS_PORT);
-  // if (!_client_tcps_ubi.verifyCertChain(_host)) {
-  //   if (_debug) {
-  //     Serial.println("[ERROR] Could not verify the remote secure server certificate, "
-  //                    "please make sure that you are using a secure "
-  //                    "network");
-  //   }
-  //   return false;
-  // }
 
   /* Sends data to Ubidots */
   if (_client_tcps_ubi.connected()) {
@@ -153,7 +145,7 @@ double UbiTCP::get(const char *device_label, const char *variable_label) {
   }
 
   if (_debug) {
-    Serial.println("ERROR could not connect to the server");
+    Serial.println(F("ERROR could not connect to the server"));
   }
 
   _client_tcps_ubi.stop();

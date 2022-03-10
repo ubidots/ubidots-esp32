@@ -71,7 +71,9 @@ bool UbiHTTP::sendData(const char *device_label, const char *device_name, char *
     Serial.print(F("Host: "));
     Serial.print(_host);
     Serial.print(F("\r\n"));
-    Serial.print(F("User-Agent: {USER_AGENT}\r\n"));
+    Serial.print(F("User-Agent: "));
+    Serial.print(_user_agent);
+    Serial.print("\r\n");
     Serial.print(F("X-Auth-Token: "));
     Serial.print(_token);
     Serial.print("\r\n");
@@ -91,7 +93,9 @@ bool UbiHTTP::sendData(const char *device_label, const char *device_name, char *
   _client_https_ubi.print(F("Host: "));
   _client_https_ubi.print(_host);
   _client_https_ubi.print(F("\r\n"));
-  _client_https_ubi.print(F("User-Agent: {USER_AGENT}\r\n"));
+  _client_https_ubi.print(F("User-Agent: "));
+  _client_https_ubi.print(_user_agent);
+  _client_https_ubi.print("\r\n");
   _client_https_ubi.print(F("X-Auth-Token: "));
   _client_https_ubi.print(_token);
   _client_https_ubi.print("\r\n");
@@ -101,6 +105,8 @@ bool UbiHTTP::sendData(const char *device_label, const char *device_name, char *
   _client_https_ubi.print(F("\r\n\r\n"));
   _client_https_ubi.print(payload);
   _client_https_ubi.print(F("\r\n"));
+  
+  _client_https_ubi.flush();
 
   /* Reads the response from the server */
   if (waitServerAnswer()) {
@@ -117,8 +123,7 @@ bool UbiHTTP::sendData(const char *device_label, const char *device_name, char *
       Serial.println(F("Could not read server's response"));
     }
   }
-
-  _client_https_ubi.stop();
+  
   return true;
 }
 
@@ -134,8 +139,8 @@ double UbiHTTP::get(const char *device_label, const char *variable_label) {
     return ERROR_VALUE;
   }
 
-  uint16_t pathLength = _pathLength(device_label, variable_label);
-  char *path = (char *)malloc(sizeof(char) * pathLength + 1);
+  int pathLength = snprintf(NULL, 0, "/api/v1.6/devices/%s/%s/lv", device_label, variable_label);
+  char *path = (char *)malloc(pathLength + sizeof(""));
   sprintf(path, "/api/v1.6/devices/%s/%s/lv", device_label, variable_label);
 
   if (_debug) {
@@ -143,12 +148,16 @@ double UbiHTTP::get(const char *device_label, const char *variable_label) {
     Serial.println(path);
   }
 
-  uint16_t requestLineLength = _requestLineLength(path);
-  char *message = (char *)malloc(sizeof(char) * requestLineLength + 1);
+  int requestLineLength = snprintf(NULL, 0,
+          "GET %s HTTP/1.1\r\nHost: %s\r\nX-Auth-Token: "
+          "%s\r\nUser-Agent: %s\r\nContent-Type: "
+          "application/json\r\n\r\n",
+          path, _host, _token, _user_agent);
+  char *message = (char *)malloc(requestLineLength + sizeof(""));
   sprintf(message,
           "GET %s HTTP/1.1\r\nHost: %s\r\nX-Auth-Token: "
           "%s\r\nUser-Agent: %s\r\nContent-Type: "
-          "application/json\r\nConnection: close\r\n\r\n",
+          "application/json\r\n\r\n",
           path, _host, _token, _user_agent);
 
   if (_debug) {
@@ -157,77 +166,60 @@ double UbiHTTP::get(const char *device_label, const char *variable_label) {
   }
 
   _client_https_ubi.print(message);
-
-  while (_client_https_ubi.connected()) {
-    if (_client_https_ubi.available()) {
-      String line = _client_https_ubi.readStringUntil('\n');
-      if (line == "\r") {
-        break;
-      }
-    }
-  }
-
+  _client_https_ubi.flush();
+  
   free(message);
   free(path);
-
-  double value = _parseServerAnswer();
-
-  _client_https_ubi.flush();
-  _client_https_ubi.stop();
+  
+  double value = NAN;
+  
+  /* Reads the response from the server */
+  if (waitServerAnswer()) {
+    value = _parseServerAnswer();
+  } else {
+    if (_debug) {
+      Serial.println(F("Could not read server's response"));
+    }
+  }
+  
   return value;
 }
 
 double UbiHTTP::_parseServerAnswer() {
-  /**
-   * @param _charResponseLength 3 is the maximun amount of digits for the length
-   * to have
-   */
-  char *_charLength = (char *)malloc(sizeof(char) * 3);
-
-  _parsePartialServerAnswer(_charLength);
-  /**
-   * The server respond the length of the value in HEX so it has to be converted
-   * to DEC
-   * */
-  uint8_t length = UbiUtils::hexadecimalToDecimal(_charLength);
-  char *_charValue = (char *)malloc(sizeof(char) * length + 1);
-
-  _parsePartialServerAnswer(_charValue);
-
-  double value = strtof(_charValue, NULL);
-
-  free(_charLength);
-  free(_charValue);
+  /* Skip response headers */
+  if (_debug) {
+    Serial.println("Server response:");
+  }
+  while (_client_https_ubi.connected()) {
+    String line = _client_https_ubi.readStringUntil('\n');
+    if (_debug) {
+      Serial.println(line);
+    }
+    if (line == "\r") {
+      break;
+    }
+  }
+  
+  String value_len_str = _client_https_ubi.readStringUntil('\n');
+  String value_str = _client_https_ubi.readStringUntil('\n');
+  
+  unsigned long value_len = strtoul(value_len_str.c_str(), NULL, 16);
+  long double value = strtold(value_str.c_str(), NULL);
+  
+  if (_debug) {
+    Serial.println(value_len_str);
+    Serial.println(value_str);
+  }
+  
+  /* Discard remaining data */
+  while (_client_https_ubi.available()) {
+    char c = _client_https_ubi.read();
+    if (_debug) {
+      Serial.write(c);
+    }
+  }
 
   return value;
-}
-
-/**
- * @brief Calculate the lenght of the request line to be send over HTTP to the
- * server
- *
- * @param path address of the endpoint to gather the data
- * @return uint16_t  Lenght of the request line
- */
-uint16_t UbiHTTP::_requestLineLength(char *path) {
-  uint16_t endpointLength = strlen(
-                                "GET  HTTP/1.1\r\nHost: \r\nX-Auth-Token: "
-                                "\r\nUser-Agent: \r\nContent-Type: "
-                                "application/json\r\nConnection: close\r\n\r\n") +
-                            strlen(path) + strlen(_host) + strlen(_token) + strlen(_user_agent);
-  return endpointLength;
-}
-
-/**
- * @brief Calculate the lenght of the path to be send over HTTP to the server
- *
- * @param device_label device label of the device
- * @param variable_label variable label to be updated or fetched
- * @return uint16_t  Lenght of the endpoint path
- */
-uint16_t UbiHTTP::_pathLength(const char *device_label, const char *variable_label) {
-  uint16_t endpointLength = strlen("/api/v1.6/devices///lv") + strlen(device_label) + strlen(variable_label);
-  return endpointLength;
 }
 
 /**
@@ -238,7 +230,7 @@ uint16_t UbiHTTP::_pathLength(const char *device_label, const char *variable_lab
 
 bool UbiHTTP::reconnect(const char *host, const int port) {
   uint8_t attempts = 0;
-  bool connected = false;
+  bool connected = _client_https_ubi.connected();
   while (!connected && attempts < _maxReconnectAttempts) {
     if (_debug) {
       Serial.print(F("Trying to connect to "));

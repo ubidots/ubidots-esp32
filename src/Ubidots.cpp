@@ -29,6 +29,8 @@ Inc
  * Overloaded constructors
  ***************************************************************************/
 
+Ubidots::Ubidots(const char *token, connectivity connectivity, IotProtocol iotProtocol, UbiServer server) {_builder(token, server, iotProtocol);}
+
 Ubidots::Ubidots(const char *token, IotProtocol iotProtocol) { _builder(token, UBI_INDUSTRIAL, iotProtocol); }
 
 Ubidots::Ubidots(const char *token, UbiServer server, IotProtocol iotProtocol) { _builder(token, server, iotProtocol); }

@@ -30,6 +30,7 @@ Inc
 
 class Ubidots {
 public:
+  explicit Ubidots(const char *token, connectivity connectivity = UBI_WIFI, IotProtocol iotProtocol = UBI_TCP, UbiServer server = UBI_INDUSTRIAL);
   explicit Ubidots(const char *token, IotProtocol iotProtocol);
   explicit Ubidots(const char *token, UbiServer server = UBI_INDUSTRIAL, IotProtocol iotProtocol = UBI_TCP);
   void add(const char *variable_label, double value);

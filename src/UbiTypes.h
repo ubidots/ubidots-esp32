@@ -42,6 +42,6 @@ typedef struct ContextUbi {
 typedef const char *UbiServer;
 
 typedef enum { UBI_HTTP, UBI_TCP, UBI_UDP } IotProtocol;
-typedef enum { UBI_WIFI, UBI_ETHERNET, UBI_MOBILE} connectivity;
+typedef enum { UBI_WIFI, UBI_ETHERNET, UBI_MOBILE} connectivityType;
 
 #endif

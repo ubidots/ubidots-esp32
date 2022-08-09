@@ -46,8 +46,9 @@ typedef const char *UbiServer;
 
 typedef enum { UBI_HTTP, UBI_TCP, UBI_UDP } IotProtocol;
 typedef enum { UBI_WIFI, UBI_ETHERNET, UBI_MOBILE} connectivityType;
-typedef std::string credentialKey, credentialValue;
-typedef std::map<credentialKey, credentialValue> connectivityCredentials;
+typedef enum { _APN_, _PIN_, _USER_, _PASSWORD_, _SSID_} credentialsType;
+typedef std::string credentialValue;
+typedef std::map< credentialsType, credentialValue> connectivityCredentials;
 
 
 #endif

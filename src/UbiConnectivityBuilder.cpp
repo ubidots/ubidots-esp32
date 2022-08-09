@@ -1,17 +1,41 @@
 #include "UbiConnectivityBuilder.h"
+#include "UbiWifi.h"
+#include "UbiEthernet.h"
+#include "UbiMobile.h"
 
 
-UbiConnectivityBuilder::UbiConnectivityBuilder(connectivityType connectivity , connectivityCredentials credentials)
+UbiConnectivityBuilder::UbiConnectivityBuilder(connectivityType connectivity)
 { 
-    connectivityCredentials wifiConnectivityCredentials { {"ssid", ""}, {"password", ""}};
-    connectivityCredentials ethernetConnectivityCredentials { {"pin-number", ""}, {"apn", ""}, {"user-login", ""}, {"password", ""}};
-    connectivityCredentials mobileConnectivityCredentials { {"ssid", ""}, {"password", ""}};
+    __connectivity = connectivity;
+    _classInstances[UBI_WIFI] = &wifiInstance;
+    _classInstances[UBI_MOBILE] = &mobileInstance;
+    _classInstances[UBI_ETHERNET] = &ethernetInstance;
+    
+
 }
 
 
 UbiConnectivity *UbiConnectivityBuilder::builder()
 {
+    classInstances::iterator i = _classInstances.find(__connectivity);
+    UbiConnectivity *UbiBuilder = (i->second)();
+    return UbiBuilder;
+}
 
+UbiConnectivity *wifiInstance()
+{
+   UbiConnectivity *instance = new UbiWifi(__credentials);
+   return instance;
+}
 
+UbiConnectivity *mobileInstance()
+{
+   UbiConnectivity *instance = new UbiMobile(__credentials);
+   return instance;
+}
 
+UbiConnectivity *ethernetInstance()
+{
+   UbiConnectivity *instance = new UbiEthernet(__credentials);
+   return instance;
 }

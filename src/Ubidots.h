@@ -52,6 +52,10 @@ public:
   bool wifiConnected();
   bool serverConnected();
   void setDeviceType(const char *deviceType);
+
+  bool connect(const char *ssid, const char *password);
+  bool connect(const char *pin, const char *apn, const char *login, const char *password);
+  bool isServerConnected();
   ~Ubidots();
 
 private:

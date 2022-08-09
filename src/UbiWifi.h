@@ -7,12 +7,14 @@
 class UbiWifi : public UbiConnectivity
 {
     public:
+        UbiWifi(connectivityCredentials credentials);
+        ~UbiWifi();
         bool connect() ;
         bool isConnected();
         bool isServerConnected();
         void getDeviceMAC(char mac[]);
-    private:
         connectivityCredentials credentials;
+    private:
 };
 
 #endif

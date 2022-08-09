@@ -2,6 +2,9 @@
 #define UBI_CONNECTIVITY_H
 
 #include "UbiTypes.h"
+#include "Arduino.h"
+
+
 
 class UbiConnectivity
 {
@@ -11,6 +14,7 @@ class UbiConnectivity
         virtual bool isConnected() = 0;
         virtual bool isServerConnected() = 0;
         virtual void getDeviceMAC(char mac[]) = 0;
+        connectivityCredentials credentials;
 };
 
 

@@ -38,9 +38,10 @@ Ubidots::Ubidots(const char *token, UbiServer server, IotProtocol iotProtocol) {
 void Ubidots::_builder(const char *token, UbiServer server, IotProtocol iotProtocol, connectivityType connectivity) {
   _getDeviceMac(_defaultDeviceLabel);
   _iotProtocol = iotProtocol;
-  _connectivityProtocol = new UbiConnectivityHandler(connectivity);
   _context = (ContextUbi *)malloc(MAX_VALUES * sizeof(ContextUbi));
+  _connectivityProtocol = new UbiConnectivityHandler(connectivity);
   _cloudProtocol = new UbiProtocolHandler(token, server, iotProtocol);
+  
 }
 
 /**************************************************************************
@@ -211,4 +212,31 @@ void Ubidots::setDeviceType(const char *deviceType) {
   } else {
     Serial.println("Device Type is only available using HTTP");
   }
+}
+
+
+
+bool Ubidots::connect(const char *ssid, const char *password)
+{
+  if(_debug)
+  {
+    bool res = _connectivityProtocol->connect(ssid, password);
+    Serial.println(res);
+    return res;
+  }
+  else {return  _connectivityProtocol->connect(ssid, password);}
+  
+
+}
+
+bool Ubidots::connect(const char *pin, const char *apn, const char *login, const char *password)
+{
+  _connectivityProtocol->connect(pin, apn, login, password);
+}
+
+bool Ubidots::isServerConnected()
+{
+
+
+
 }

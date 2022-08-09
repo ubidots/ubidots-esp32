@@ -7,10 +7,12 @@
 class UbiWifi : public UbiConnectivity
 {
     public:
-        virtual bool connect() ;
-        virtual bool isConnected();
-        virtual bool isServerConnected();
-        virtual void getDeviceMAC(char mac[]);
+        bool connect() ;
+        bool isConnected();
+        bool isServerConnected();
+        void getDeviceMAC(char mac[]);
+    private:
+        connectivityCredentials credentials;
 };
 
 #endif

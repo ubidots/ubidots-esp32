@@ -27,6 +27,7 @@ Inc
 #define _Ubidots_H_
 
 #include "UbiProtocolHandler.h"
+#include "UbiConnectivityHandler.h"
 
 class Ubidots {
 public:
@@ -46,6 +47,7 @@ public:
   bool send(const char *device_label, const char *device_name);
   double get(const char *device_label, const char *variable_label);
   void setDebug(bool debug);
+  
   bool wifiConnect(const char *ssid, const char *password);
   bool wifiConnected();
   bool serverConnected();
@@ -56,12 +58,13 @@ private:
   char _deviceType[25];
   uint8_t _maxConnectionAttempts = 20;
   UbiProtocolHandler *_cloudProtocol;
+  UbiConnectivityHandler * _connectivityProtocol;
   char _defaultDeviceLabel[18];
   ContextUbi *_context;
   IotProtocol _iotProtocol;
   int8_t _current_context = 0;
   bool _debug = false;
-  void _builder(const char *token, UbiServer server, IotProtocol iot_protocol);
+  void _builder(const char *token, UbiServer server, IotProtocol iot_protocol, connectivityType connectivity = UBI_WIFI);
   void _getDeviceMac(char macAddr[]);
 };
 

@@ -9,9 +9,6 @@ UbiConnectivity *wifiInstance();
 UbiConnectivity *mobileInstance();
 UbiConnectivity *ethernetInstance();
 
-typedef std::string credentialKey, credentialValue;
-typedef std::map<credentialKey, credentialValue> connectivityCredentials;
-
 
 
 class UbiConnectivityBuilder

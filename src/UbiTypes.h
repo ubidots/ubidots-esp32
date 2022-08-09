@@ -26,6 +26,9 @@ Inc
 #ifndef _UbiTypes_H_
 #define _UbiTypes_H_
 
+#include <map>
+#include <iostream>
+
 typedef struct Value {
   const char *variable_label;
   char *dot_context;
@@ -43,5 +46,8 @@ typedef const char *UbiServer;
 
 typedef enum { UBI_HTTP, UBI_TCP, UBI_UDP } IotProtocol;
 typedef enum { UBI_WIFI, UBI_ETHERNET, UBI_MOBILE} connectivityType;
+typedef std::string credentialKey, credentialValue;
+typedef std::map<credentialKey, credentialValue> connectivityCredentials;
+
 
 #endif

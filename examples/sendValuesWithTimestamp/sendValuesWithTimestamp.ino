@@ -14,8 +14,9 @@
 const char* UBIDOTS_TOKEN = "...";  // Put here your Ubidots TOKEN
 const char* WIFI_SSID = "...";      // Put here your Wi-Fi SSID
 const char* WIFI_PASS = "...";      // Put here your Wi-Fi password
+const char* VARIABLE_LABEL = "..."; // Put here your variable label
 
-Ubidots* ubidots;
+Ubidots* ubidots{nullptr};
 
 /****************************************
  * Auxiliar Functions

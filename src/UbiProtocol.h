@@ -26,6 +26,7 @@ Inc
 #define _UbiProtocol_H_
 
 #include <WiFiClientSecure.h>
+#include <WiFi.h>
 
 #include "UbiConstants.h"
 
